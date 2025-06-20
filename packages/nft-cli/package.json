@@ -28,6 +28,9 @@
     "@clack/prompts": "^0.11.0",
     "@filebase/sdk": "^1.0.6",
     "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot/keyring": "^13.5.2",
+    "@polkadot/util": "^13.5.2",
+    "@polkadot/util-crypto": "^13.5.2",
     "dotenv": "^16.5.0",
     "picocolors": "^1.1.1",
     "polkadot-api": "^1.14.0"

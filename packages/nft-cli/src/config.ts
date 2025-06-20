@@ -1,8 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
-import { intro } from '@clack/prompts'
-import pc from 'picocolors'
 import { collectFilebaseCredentials, collectMnemonic } from './prompts.js'
 
 export interface UserConfig {
@@ -16,8 +14,6 @@ const CONFIG_DIR = '/tmp/dot-nft'
 const CONFIG_FILE = join(CONFIG_DIR, 'config.json')
 
 export async function setupConfig(): Promise<UserConfig> {
-  intro(pc.bgBlue(' DOT NFT CLI Setup '))
-
   const mnemonic = await collectMnemonic()
   const filebaseCredentials = await collectFilebaseCredentials()
 

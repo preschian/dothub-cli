@@ -1,36 +1,11 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import process from 'node:process'
-import { note, outro, select } from '@clack/prompts'
+import { intro, outro, select } from '@clack/prompts'
 import pc from 'picocolors'
-import { getAccountInfo } from './account.js'
+import { displayAccountInfo } from './account.js'
 import { getConfigPath, loadConfig, saveConfig, setupConfig } from './config.js'
 import { runMintingWorkflow } from './mint.js'
-import { promptForReconfiguration } from './prompts.js'
-
-async function displayAccountInfo(mnemonic: string) {
-  try {
-    note('Fetching account information...', 'Account Details')
-
-    const accountInfo = await getAccountInfo(mnemonic)
-
-    const accountDetails = [
-      `${pc.bold('Address:')} ${pc.cyan(accountInfo.address)}`,
-      `${pc.bold('Chain:')} ${pc.blue(accountInfo.balance.chainName)}`,
-      '',
-      `${pc.bold('Balance Information:')}`,
-      `  ${pc.green('●')} Free: ${pc.bold(accountInfo.balance.free)} DOT`,
-      `  ${pc.yellow('●')} Reserved: ${pc.bold(accountInfo.balance.reserved)} DOT`,
-      `  ${pc.blue('●')} Frozen: ${pc.bold(accountInfo.balance.frozen)} DOT`,
-      `  ${pc.magenta('●')} Total: ${pc.bold(accountInfo.balance.total)} DOT`,
-    ].join('\n')
-
-    note(accountDetails, 'Account Information')
-  }
-  catch (error) {
-    note(`Failed to fetch account information: ${error}`, 'Error')
-  }
-}
 
 async function showMainMenu() {
   const action = await select({
@@ -52,15 +27,6 @@ async function main() {
     const existingConfig = await loadConfig()
 
     if (existingConfig) {
-      const shouldReconfigure = await promptForReconfiguration()
-
-      if (shouldReconfigure) {
-        // Setup new configuration
-        const config = await setupConfig()
-        saveConfig(config)
-        outro(pc.green(`Configuration updated! Saved to ${getConfigPath()}`))
-      }
-
       // Show account info
       await displayAccountInfo(existingConfig.mnemonic)
 
@@ -98,9 +64,6 @@ async function main() {
 
       outro(pc.green(`Setup complete! Configuration saved to ${getConfigPath()}\nReady to mint NFTs on Paseo Asset Hub! 🚀`))
 
-      // Show account info for new setup
-      await displayAccountInfo(config.mnemonic)
-
       // Start main menu
       await main()
     }
@@ -112,5 +75,6 @@ async function main() {
 }
 
 if (import.meta.main) {
+  intro(pc.bgBlue(' Dot NFT CLI 🎨 '))
   main()
 }

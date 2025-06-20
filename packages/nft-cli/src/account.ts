@@ -1,14 +1,13 @@
+import { note } from '@clack/prompts'
 import { sr25519CreateDerive } from '@polkadot-labs/hdkd'
 import { entropyToMiniSecret } from '@polkadot-labs/hdkd-helpers'
 import { Keyring } from '@polkadot/keyring'
-import { cryptoWaitReady, mnemonicToEntropy } from '@polkadot/util-crypto'
+import { mnemonicToEntropy } from '@polkadot/util-crypto'
+import pc from 'picocolors'
 import { getPolkadotSigner } from 'polkadot-api/signer'
 import { sdk } from './polkadot.js'
 
 export async function deriveAccountFromMnemonic(mnemonic: string) {
-  // Wait for crypto to be ready
-  await cryptoWaitReady()
-
   // Create keyring for substrate accounts
   const keyring = new Keyring({ type: 'sr25519', ss58Format: 0 })
   const pair = keyring.addFromMnemonic(mnemonic)
@@ -45,17 +44,18 @@ export async function getAccountBalance(address: string) {
     const accountInfo = await sdk('westend').api.query.System.Account.getValue(address)
     const chainSpec = await sdk('westend').client.getChainSpecData()
     const chainSymbol = chainSpec.properties.tokenSymbol as string
+    const chainDecimals = chainSpec.properties.tokenDecimals as number
     const chainName = chainSpec.name
 
     if (!accountInfo) {
       return emptyState
     }
 
-    // Convert from planck (smallest unit) to DOT
-    const free = `${formatBalance(accountInfo.data.free)} ${chainSymbol}`
-    const reserved = `${formatBalance(accountInfo.data.reserved)} ${chainSymbol}`
-    const frozen = `${formatBalance(accountInfo.data.frozen)} ${chainSymbol}`
-    const total = `${formatBalance(accountInfo.data.free + accountInfo.data.reserved)} ${chainSymbol}`
+    // Convert from planck (smallest unit)
+    const free = `${formatBalance(accountInfo.data.free, chainDecimals)} ${chainSymbol}`
+    const reserved = `${formatBalance(accountInfo.data.reserved, chainDecimals)} ${chainSymbol}`
+    const frozen = `${formatBalance(accountInfo.data.frozen, chainDecimals)} ${chainSymbol}`
+    const total = `${formatBalance(accountInfo.data.free + accountInfo.data.reserved, chainDecimals)} ${chainSymbol}`
 
     return {
       free,
@@ -72,19 +72,33 @@ export async function getAccountBalance(address: string) {
   }
 }
 
-export async function getAccountInfo(mnemonic: string) {
-  const account = await deriveAccountFromMnemonic(mnemonic)
-  const balance = await getAccountBalance(account.address)
+export async function displayAccountInfo(mnemonic: string) {
+  try {
+    note('Fetching account information...', 'Account Details')
 
-  return {
-    address: account.address,
-    balance,
+    const account = await deriveAccountFromMnemonic(mnemonic)
+    const balance = await getAccountBalance(account.address)
+
+    const accountDetails = [
+      `${pc.bold('Address:')} ${pc.cyan(account.address)}`,
+      `${pc.bold('Chain:')} ${pc.blue(balance.chainName)}`,
+      '',
+      `${pc.bold('Balance Information:')}`,
+      `  ${pc.green('●')} Free: ${pc.bold(balance.free)} DOT`,
+      `  ${pc.yellow('●')} Reserved: ${pc.bold(balance.reserved)} DOT`,
+      `  ${pc.blue('●')} Frozen: ${pc.bold(balance.frozen)} DOT`,
+      `  ${pc.magenta('●')} Total: ${pc.bold(balance.total)} DOT`,
+    ].join('\n')
+
+    note(accountDetails, 'Account Information')
+  }
+  catch (error) {
+    note(`Failed to fetch account information: ${error}`, 'Error')
   }
 }
-function formatBalance(balance: bigint): string {
-  // Paseo Asset Hub uses 10 decimal places (like DOT)
-  const decimals = 10n
-  const divisor = 10n ** decimals
+
+function formatBalance(balance: bigint, decimals = 10) {
+  const divisor = BigInt(10 ** decimals)
 
   const whole = balance / divisor
   const remainder = balance % divisor

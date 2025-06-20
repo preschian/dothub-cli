@@ -19,8 +19,12 @@
       },
       "devDependencies": {
         "@antfu/eslint-config": "^4.15.0",
+        "@types/bun": "latest",
         "eslint": "^9.29.0",
         "tsdown": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
       },
     },
     "playground/xcm-transfer": {

@@ -1,0 +1,108 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# NFT CLI - Polkadot Ecosystem
+
+## Project Summary
+
+This is **dot-nft**, a command-line interface tool for minting NFTs on the Polkadot ecosystem. The project is currently in Phase 1, supporting **Paseo Asset Hub** as the primary parachain for NFT operations.
+
+### Key Features
+- CLI-based NFT minting on Polkadot ecosystem
+- Image upload and IPFS storage via Filebase
+- Interactive prompts using @clack/prompts
+- TypeScript-first development
+- Bun runtime for optimal performance
+
+### Current Architecture
+- **Runtime**: Bun (preferred over Node.js/npm/pnpm)
+- **Language**: TypeScript with isolated declarations
+- **Build Tool**: tsdown for fast TypeScript compilation
+- **CLI Framework**: @clack/prompts for user interactions
+- **Storage**: Filebase SDK for IPFS uploads
+- **Target Network**: Paseo Asset Hub (Phase 1)
+
+## Development Guidelines
+
+### Technology Stack Preferences
+- **ALWAYS use Bun** instead of Node.js, npm, pnpm, or Vite
+- Use TypeScript with strict typing
+- Prefer ES modules (`"type": "module"`)
+- Use tsdown for building instead of tsc or other bundlers
+
+### Code Patterns
+- Interactive CLI flows using @clack/prompts
+- Async/await for all operations
+- Environment variables for configuration (S3_KEY, S3_SECRET, S3_BUCKET)
+- Error handling with try/catch blocks
+- Console logging for user feedback
+
+### NFT & Blockchain Specific
+- Focus on Polkadot ecosystem standards
+- Paseo Asset Hub is the current testnet target
+- IPFS integration for metadata and asset storage
+- Support for common image formats (PNG, JPG, etc.)
+
+### File Structure
+```
+src/
+├── index.ts          # Main CLI entry point
+├── upload.ts         # IPFS upload functionality
+└── [future modules]  # NFT minting, wallet integration, etc.
+```
+
+### Environment Setup
+Required environment variables:
+- `S3_KEY`: Filebase S3 access key
+- `S3_SECRET`: Filebase S3 secret key  
+- `S3_BUCKET`: Filebase S3 bucket name
+
+### Future Considerations (Phase 2+)
+- Support for additional parachains (Statemint, etc.)
+- Wallet integration (Polkadot{.js} extension)
+- Batch minting capabilities
+- Metadata standards compliance
+- Collection management features
+
+## Commands & Scripts
+
+### Development
+```bash
+bun install          # Install dependencies
+bun run dev         # Development mode with watch
+bun run build       # Build for production
+```
+
+### Testing
+- Use example images in `example-images/` for testing uploads
+- Test CLI flows with various input scenarios
+
+## Code Style & Conventions
+
+- Use @antfu/eslint-config for linting
+- Follow TypeScript strict mode
+- Async/await over Promises.then()
+- Descriptive variable names for CLI operations
+- Error messages should be user-friendly
+- Use picocolors for terminal styling
+
+## Integration Points
+
+### Current Integrations
+- **Filebase SDK**: For IPFS storage
+- **@clack/prompts**: For CLI interactions
+- **dotenv**: For environment management
+
+### Planned Integrations
+- **@polkadot/api**: For blockchain interactions
+- **@polkadot/extension-dapp**: For wallet connectivity
+- **@polkadot/util-crypto**: For cryptographic operations
+
+## Notes
+
+- This is a TypeScript library that compiles to JavaScript
+- Exports are configured for both CJS and ESM compatibility
+- The package is currently published as `dot-nft`
+- Phase 1 focuses on core functionality and Paseo Asset Hub support

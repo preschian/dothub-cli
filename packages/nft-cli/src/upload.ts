@@ -7,17 +7,15 @@ import { ObjectManager } from '@filebase/sdk'
 export interface UploadResult {
   ipfsHash: string
   filebaseUrl: string
+  filebaseUri: string
   fileName: string
 }
 
-export interface NFTMetadata {
+export interface Metadata {
   name: string
   description: string
   image: string
-  attributes?: Array<{
-    trait_type: string
-    value: string | number
-  }>
+  source: string
 }
 
 export async function uploadImageToIPFS(
@@ -44,21 +42,21 @@ export async function uploadImageToIPFS(
 
   return {
     ipfsHash: cid,
-    filebaseUrl: `https://gateway.filebase.io/ipfs/${cid}`,
+    filebaseUrl: `https://nftstorage.link/ipfs/${cid}`,
+    filebaseUri: `ipfs://${cid}`,
     fileName,
   }
 }
 
 export async function uploadMetadataToIPFS(
-  metadata: NFTMetadata,
-  tokenId: number,
+  metadata: Metadata,
   config: UserConfig,
 ): Promise<UploadResult> {
   const objectManager = new ObjectManager(config.filebaseKey, config.filebaseSecret, {
     bucket: config.filebaseBucket,
   })
 
-  const fileName = `metadata-${tokenId}.json`
+  const fileName = `metadata-${metadata.name.toLowerCase().replace(/\s+/g, '-')}.json`
   const metadataJson = JSON.stringify(metadata, null, 2)
 
   // Upload metadata JSON using ObjectManager with proper parameters
@@ -74,7 +72,8 @@ export async function uploadMetadataToIPFS(
 
   return {
     ipfsHash: cid,
-    filebaseUrl: `https://gateway.filebase.io/ipfs/${cid}`,
+    filebaseUrl: `https://nftstorage.link/ipfs/${cid}`,
+    filebaseUri: `ipfs://${cid}`,
     fileName,
   }
 }

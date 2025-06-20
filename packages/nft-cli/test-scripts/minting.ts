@@ -44,3 +44,13 @@ txCollectionMetadata.signSubmitAndWatch(signer).subscribe({
     process.exit(0)
   },
 })
+
+api.tx.Nfts.mint({
+  collection: collectionId,
+  item: 1,
+  mint_to: MultiAddress.Id('5FduGmdAjpdiWL8d9fDDKD6kiuUicefrTe7SDEK9RC6frHPW'),
+  witness_data: {
+    mint_price: 0n,
+    owned_item: 0,
+  },
+})

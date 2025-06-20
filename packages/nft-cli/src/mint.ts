@@ -1,10 +1,11 @@
 import type { UserConfig } from './config.js'
-import type { NFTMetadata } from './upload.js'
+import type { Metadata } from './upload.js'
 import { existsSync, statSync } from 'node:fs'
 import { basename } from 'node:path'
 import process from 'node:process'
-import { confirm, note, outro, select, spinner, text } from '@clack/prompts'
+import { confirm, note, outro, spinner, text } from '@clack/prompts'
 import pc from 'picocolors'
+import { createCollection } from './api-mint.js'
 import { getImagesFromFolder, uploadImageToIPFS, uploadMetadataToIPFS } from './upload.js'
 
 export interface CollectionInfo {
@@ -29,8 +30,6 @@ export async function createCollectionPrompt(): Promise<CollectionInfo> {
     validate: (value) => {
       if (!value)
         return 'Collection name is required'
-      if (value.length < 3)
-        return 'Collection name must be at least 3 characters'
     },
   })
 
@@ -45,8 +44,6 @@ export async function createCollectionPrompt(): Promise<CollectionInfo> {
     validate: (value) => {
       if (!value)
         return 'Collection description is required'
-      if (value.length < 10)
-        return 'Description must be at least 10 characters'
     },
   })
 
@@ -57,7 +54,7 @@ export async function createCollectionPrompt(): Promise<CollectionInfo> {
 
   const collectionImagePath = await text({
     message: 'Enter collection image path:',
-    placeholder: './collection-image.png',
+    placeholder: '/Users/dot-nft/collection.png',
     validate: (value) => {
       if (!value)
         return 'Collection image path is required'
@@ -174,20 +171,32 @@ export async function getMintingOptionsPrompt(): Promise<MintingOptions> {
   }
 }
 
-export async function uploadCollectionImage(
+export async function uploadCollectionMetadata(
   collectionInfo: CollectionInfo,
   config: UserConfig,
-): Promise<string> {
+) {
   const s = spinner()
-  s.start('Uploading collection image to IPFS...')
 
   try {
-    const result = await uploadImageToIPFS(collectionInfo.collectionImagePath, config)
-    s.stop(`Collection image uploaded: ${pc.cyan(result.ipfsHash)}`)
-    return result.ipfsHash
+    s.start('Uploading collection image to IPFS...')
+    const image = await uploadImageToIPFS(collectionInfo.collectionImagePath, config)
+    s.stop(`Collection image uploaded: ${pc.cyan(image.filebaseUrl)}`)
+
+    const metadata: Metadata = {
+      name: collectionInfo.name,
+      description: collectionInfo.description,
+      image: image.filebaseUri,
+      source: 'dot-nft-cli',
+    }
+
+    s.start('Uploading collection metadata to IPFS...')
+    const metadataResult = await uploadMetadataToIPFS(metadata, config)
+    s.stop(`Collection metadata uploaded: ${pc.cyan(metadataResult.filebaseUrl)}`)
+
+    return metadataResult.filebaseUri
   }
   catch (error) {
-    s.stop(`Failed to upload collection image: ${error}`)
+    s.stop(`Failed to upload collection metadata: ${error}`)
     throw error
   }
 }
@@ -272,17 +281,21 @@ export async function mintNFTs(
 
 export async function runMintingWorkflow(config: UserConfig): Promise<void> {
   try {
-    // Step 1: Create collection
+    // Step 1: Prompt for collection
     const collectionInfo = await createCollectionPrompt()
 
-    // Step 2: Upload collection image
-    await uploadCollectionImage(collectionInfo, config)
+    // Step 2: Upload collection metadata
+    const collectionMetadataUri = await uploadCollectionMetadata(collectionInfo, config)
+
+    // Step 3: Create collection
+    const collectionId = await createCollection(config.mnemonic, collectionMetadataUri)
+    console.log(collectionId)
 
     // Step 3: Get minting options
-    const mintingOptions = await getMintingOptionsPrompt()
+    // const mintingOptions = await getMintingOptionsPrompt()
 
     // Step 4: Mint NFTs
-    await mintNFTs(collectionInfo, mintingOptions, config)
+    // await mintNFTs(collectionInfo, mintingOptions, config)
 
     outro(pc.green('NFT collection minting completed! 🚀'))
   }

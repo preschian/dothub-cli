@@ -11,10 +11,26 @@ async function showMainMenu() {
   const action = await select({
     message: 'What would you like to do?',
     options: [
-      { value: 'mint', label: '🎨 Create NFT Collection & Mint NFTs', hint: 'Upload images and create NFT collection' },
-      { value: 'account', label: '👤 View Account Information', hint: 'Show wallet address and balance' },
-      { value: 'config', label: '⚙️  Reconfigure Settings', hint: 'Update credentials and configuration' },
-      { value: 'exit', label: '🚪 Exit', hint: 'Close the application' },
+      {
+        value: 'mint',
+        label: '🎨 Create NFT Collection & Mint NFTs',
+        hint: 'Upload images and create NFT collection',
+      },
+      {
+        value: 'account',
+        label: '👤 View Account Information',
+        hint: 'Show wallet address and balance',
+      },
+      {
+        value: 'config',
+        label: '⚙️ Reconfigure Settings',
+        hint: 'Update credentials and configuration',
+      },
+      {
+        value: 'exit',
+        label: '🚪 Exit',
+        hint: 'Close the application',
+      },
     ],
   })
 

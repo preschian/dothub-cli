@@ -7,6 +7,12 @@
       "metadata": ".papi/metadata/paseo_asset_hub.scale",
       "genesis": "0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2",
       "codeHash": "0xb7f52ff9b4fb5124568a5b8cbfcebba2bc9318bcb5916b69457c10bc6a2d0ac5"
+    },
+    "westend_asset_hub": {
+      "chain": "westend2_asset_hub",
+      "metadata": ".papi/metadata/westend_asset_hub.scale",
+      "genesis": "0x67f9723393ef76214df0118c34bbbd3dbebc8ed46a10973a8c969d48fe7598c9",
+      "codeHash": "0x4d4e036d59a3f54d499c935535a847b1f9885226ff776baf7c92e2bd0bf4a55e"
     }
   }
 }

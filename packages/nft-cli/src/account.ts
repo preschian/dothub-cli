@@ -1,21 +1,32 @@
+import { sr25519CreateDerive } from '@polkadot-labs/hdkd'
+import { entropyToMiniSecret } from '@polkadot-labs/hdkd-helpers'
 import { Keyring } from '@polkadot/keyring'
-import { cryptoWaitReady } from '@polkadot/util-crypto'
-import { api_paseo_asset_hub, client_paseo_asset_hub } from './polkadot.js'
+import { cryptoWaitReady, mnemonicToEntropy } from '@polkadot/util-crypto'
+import { getPolkadotSigner } from 'polkadot-api/signer'
+import { sdk } from './polkadot.js'
 
-export async function deriveAccountFromMnemonic(mnemonic: string): Promise<{
-  address: string
-}> {
+export async function deriveAccountFromMnemonic(mnemonic: string) {
   // Wait for crypto to be ready
   await cryptoWaitReady()
 
   // Create keyring for substrate accounts
   const keyring = new Keyring({ type: 'sr25519', ss58Format: 0 })
-
-  // Create account from mnemonic
   const pair = keyring.addFromMnemonic(mnemonic)
+
+  // signer - properly create from mnemonic using hdkd
+  const entropy = mnemonicToEntropy(mnemonic)
+  const miniSecret = entropyToMiniSecret(entropy)
+  const derive = sr25519CreateDerive(miniSecret)
+  const keypair = derive('')
+  const signer = getPolkadotSigner(
+    keypair.publicKey,
+    'Sr25519',
+    input => keypair.sign(input),
+  )
 
   return {
     address: pair.address,
+    signer,
   }
 }
 
@@ -31,8 +42,8 @@ export async function getAccountBalance(address: string) {
 
   try {
     // Get account info from the chain
-    const accountInfo = await api_paseo_asset_hub.query.System.Account.getValue(address)
-    const chainSpec = await client_paseo_asset_hub.getChainSpecData()
+    const accountInfo = await sdk('westend').api.query.System.Account.getValue(address)
+    const chainSpec = await sdk('westend').client.getChainSpecData()
     const chainSymbol = chainSpec.properties.tokenSymbol as string
     const chainName = chainSpec.name
 
@@ -70,7 +81,6 @@ export async function getAccountInfo(mnemonic: string) {
     balance,
   }
 }
-
 function formatBalance(balance: bigint): string {
   // Paseo Asset Hub uses 10 decimal places (like DOT)
   const decimals = 10n

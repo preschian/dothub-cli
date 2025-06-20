@@ -10,12 +10,16 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "dot-nft": "./dist/index.js"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
-    "dev": "tsdown --watch"
+    "dev": "tsdown --watch",
+    "start": "bun run src/index.ts"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -23,8 +27,10 @@
   "dependencies": {
     "@clack/prompts": "^0.11.0",
     "@filebase/sdk": "^1.0.6",
+    "@polkadot-api/descriptors": "file:.papi/descriptors",
     "dotenv": "^16.5.0",
-    "picocolors": "^1.1.1"
+    "picocolors": "^1.1.1",
+    "polkadot-api": "^1.14.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.15.0",

@@ -2,12 +2,14 @@ import { note } from '@clack/prompts'
 import { sr25519CreateDerive } from '@polkadot-labs/hdkd'
 import { entropyToMiniSecret } from '@polkadot-labs/hdkd-helpers'
 import { Keyring } from '@polkadot/keyring'
-import { mnemonicToEntropy } from '@polkadot/util-crypto'
+import { cryptoWaitReady, mnemonicToEntropy } from '@polkadot/util-crypto'
 import pc from 'picocolors'
 import { getPolkadotSigner } from 'polkadot-api/signer'
 import { sdk } from './polkadot.js'
 
 export async function deriveAccountFromMnemonic(mnemonic: string) {
+  await cryptoWaitReady()
+
   // Create keyring for substrate accounts
   const keyring = new Keyring({ type: 'sr25519', ss58Format: 0 })
   const pair = keyring.addFromMnemonic(mnemonic)

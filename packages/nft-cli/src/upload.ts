@@ -26,7 +26,7 @@ export async function uploadImageToIPFS(
     bucket: config.filebaseBucket,
   })
 
-  const fileName = basename(imagePath)
+  const fileName = `${basename(imagePath)}-${Date.now()}`
   const fileContent = readFileSync(imagePath)
 
   // Upload file using ObjectManager with proper parameters
@@ -56,7 +56,7 @@ export async function uploadMetadataToIPFS(
     bucket: config.filebaseBucket,
   })
 
-  const fileName = `metadata-${metadata.name.toLowerCase().replace(/\s+/g, '-')}.json`
+  const fileName = `metadata-${metadata.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.json`
   const metadataJson = JSON.stringify(metadata, null, 2)
 
   // Upload metadata JSON using ObjectManager with proper parameters
@@ -97,6 +97,7 @@ export function getImagesFromFolder(folderPath: string): string[] {
           return false
         }
       })
+      .sort()
   }
   catch (error) {
     console.error('Error reading folder:', error)

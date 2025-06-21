@@ -5,7 +5,7 @@ import { intro, outro, select } from '@clack/prompts'
 import pc from 'picocolors'
 import { displayAccountInfo } from './account.js'
 import { getConfigPath, loadConfig, saveConfig, setupConfig } from './config.js'
-import { runMintingWorkflow } from './mint.js'
+import { runMintingWorkflow } from './create-collection.js'
 
 async function showMainMenu() {
   const action = await select({

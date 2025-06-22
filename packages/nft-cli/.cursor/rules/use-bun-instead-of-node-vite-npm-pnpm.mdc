@@ -3,8 +3,9 @@ description: Use Bun instead of Node.js, npm, pnpm, or vite.
 globs: "*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json"
 alwaysApply: false
 ---
+Use Bun instead of Node.js, npm, pnpm, or vite.
 
-Default to using Bun instead of Node.js.
+Default to using Bun instead of Node.js for **development and tooling**.
 
 - Use `bun <file>` instead of `node <file>` or `ts-node <file>`
 - Use `bun test` instead of `jest` or `vitest`
@@ -13,15 +14,28 @@ Default to using Bun instead of Node.js.
 - Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
 - Bun automatically loads .env, so don't use dotenv.
 
+## ⚠️ IMPORTANT: Compilation Compatibility
+
+**For CLI tools and libraries that need to be compiled/distributed:**
+- **AVOID Bun-specific APIs** in source code (Bun.file, Bun.serve, etc.)
+- Use standard Node.js APIs (`node:fs`, `node:path`, etc.) for compatibility
+- Bun should be used for development speed, not as a runtime dependency
+- Source code must compile to standard JavaScript that runs without Bun
+
 ## APIs
 
+**For development-only/server applications:**
 - `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
 - `bun:sqlite` for SQLite. Don't use `better-sqlite3`.
 - `Bun.redis` for Redis. Don't use `ioredis`.
 - `Bun.sql` for Postgres. Don't use `pg` or `postgres.js`.
 - `WebSocket` is built-in. Don't use `ws`.
-- Prefer `Bun.file` over `node:fs`'s readFile/writeFile
 - Bun.$`ls` instead of execa.
+
+**For CLI/library code that needs compilation:**
+- Use `readFileSync/writeFileSync` from `node:fs` instead of `Bun.file`
+- Use standard Node.js APIs for maximum compatibility
+- Prefer portable solutions over Bun-specific optimizations
 
 ## Testing
 

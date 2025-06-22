@@ -14,10 +14,12 @@ This is **dot-nft**, a command-line interface tool for minting NFTs on the Polka
 - Image upload and IPFS storage via Filebase
 - Interactive prompts using @clack/prompts
 - TypeScript-first development
-- Bun runtime for optimal performance
+- Bun runtime for optimal development performance
+- Compiled CLI for broad distribution compatibility
 
 ### Current Architecture
-- **Runtime**: Bun (preferred over Node.js/npm/pnpm)
+- **Development Runtime**: Bun (preferred over Node.js/npm/pnpm)
+- **Distribution**: Compiled TypeScript for broad compatibility
 - **Language**: TypeScript with isolated declarations
 - **CLI Framework**: @clack/prompts for user interactions
 - **Storage**: Filebase SDK for IPFS uploads
@@ -26,9 +28,11 @@ This is **dot-nft**, a command-line interface tool for minting NFTs on the Polka
 ## Development Guidelines
 
 ### Technology Stack Preferences
-- **ALWAYS use Bun** instead of Node.js, npm, pnpm, or Vite
+- **Use Bun for development** instead of Node.js, npm, pnpm, or Vite
+- **Avoid Bun-specific APIs** in source code for compilation compatibility
 - Use TypeScript with strict typing
 - Prefer ES modules (`"type": "module"`)
+- Write portable code that compiles to standard JavaScript
 
 ### Code Patterns
 - Interactive CLI flows using @clack/prompts
@@ -36,6 +40,13 @@ This is **dot-nft**, a command-line interface tool for minting NFTs on the Polka
 - Environment variables for configuration (S3_KEY, S3_SECRET, S3_BUCKET)
 - Error handling with try/catch blocks
 - Console logging for user feedback
+- **Use standard Node.js APIs** (node:fs, node:path) instead of Bun-specific APIs
+
+### Compilation & Distribution
+- CLI must be compilable for distribution to users without Bun
+- Source code should use standard Node.js APIs where possible
+- Bun is used for development speed and tooling, not for runtime dependencies
+- Target both CJS and ESM compatibility
 
 ### NFT & Blockchain Specific
 - Focus on Polkadot ecosystem standards
@@ -100,7 +111,9 @@ bun run build       # Build for production
 
 ## Notes
 
-- This is a TypeScript library that compiles to JavaScript
+- This is a TypeScript library that compiles to JavaScript for distribution
+- **Development uses Bun for speed, but source code must be compilation-compatible**
 - Exports are configured for both CJS and ESM compatibility
 - The package is currently published as `dot-nft`
 - Phase 1 focuses on core functionality and Paseo Asset Hub support
+- **Avoid Bun.file(), Bun.serve(), and other Bun-specific APIs in source code**

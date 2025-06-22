@@ -124,7 +124,5 @@ async function main() {
   }
 }
 
-if (import.meta.main) {
-  intro(pc.bgBlue(' Dot NFT CLI 🎨 '))
-  main()
-}
+intro(pc.bgBlue(' Dot NFT CLI 🎨 '))
+main()

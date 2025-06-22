@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
 import { collectChainSelection, collectFilebaseCredentials, collectMnemonic } from './prompts.js'
@@ -54,8 +54,8 @@ export async function loadConfig(): Promise<UserConfig | null> {
       return null
     }
 
-    const configData = Bun.file(CONFIG_FILE)
-    return JSON.parse(await configData.text()) as UserConfig
+    const configData = readFileSync(CONFIG_FILE, 'utf8')
+    return JSON.parse(configData) as UserConfig
   }
   catch (error) {
     console.error('Failed to load configuration:', error)

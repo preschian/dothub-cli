@@ -1,8 +1,8 @@
 import type { Chain } from './config.js'
-import { paseo_asset_hub, westend_asset_hub } from '@polkadot-api/descriptors'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
-import { getWsProvider } from 'polkadot-api/ws-provider/web'
+import { getWsProvider } from 'polkadot-api/ws-provider/node'
+import { paseo_asset_hub, westend_asset_hub } from './descriptors/dist/index'
 
 const client_paseo_asset_hub = createClient(
   withPolkadotSdkCompat(

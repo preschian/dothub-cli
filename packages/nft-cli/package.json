@@ -4,17 +4,22 @@
   "version": "0.0.1-alpha.1",
   "description": "A CLI tool for minting NFTs on the Polkadot ecosystem",
   "bin": {
-    "dot-nft": "./dist/dot-nft"
+    "dot-nft": "./dist/index.cjs"
   },
   "files": [
+    ".papi",
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --compile --minify --sourcemap --outfile ./dist/dot-nft",
-    "dev": "bun run --watch src/index.ts",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "start": "bun run src/index.ts",
-    "prepack": "bun run build"
+    "postinstall": "npx papi",
+    "prepare": "bun run build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -22,7 +27,6 @@
   "dependencies": {
     "@clack/prompts": "^0.11.0",
     "@filebase/sdk": "^1.0.6",
-    "@polkadot-api/descriptors": "file:.papi/descriptors",
     "@polkadot-labs/hdkd": "^0.0.17",
     "@polkadot-labs/hdkd-helpers": "^0.0.17",
     "@polkadot/keyring": "^13.5.2",
@@ -35,6 +39,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.15.0",
     "@types/bun": "latest",
-    "eslint": "^9.29.0"
+    "eslint": "^9.29.0",
+    "tsdown": "^0.12.8"
   }
 }

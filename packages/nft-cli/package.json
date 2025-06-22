@@ -4,18 +4,18 @@
   "version": "0.0.0",
   "description": "A CLI tool for minting NFTs on the Polkadot ecosystem",
   "bin": {
-    "dot-nft": "./dist/index"
+    "dot-nft": "./dist/dot-nft"
   },
   "files": [
-    ".papi",
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --compile --minify --sourcemap --outfile ./dist/index",
+    "build": "bun build ./src/index.ts --compile --minify --sourcemap --outfile ./dist/dot-nft",
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "postinstall": "npx papi"
+    "postinstall": "npx papi",
+    "prepack": "bun run build"
   },
   "peerDependencies": {
     "typescript": "^5"

@@ -8,13 +8,14 @@ import { Binary } from 'polkadot-api'
 import { deriveAccountFromMnemonic } from '../src/account'
 import { sdk } from '../src/polkadot'
 
-const { signer } = await deriveAccountFromMnemonic(process.env.MNEMONIC || '')
-const { api } = sdk('westend')
 const owner = '5FduGmdAjpdiWL8d9fDDKD6kiuUicefrTe7SDEK9RC6frHPW'
+const { signer } = await deriveAccountFromMnemonic(process.env.MNEMONIC || '')
+const network = 'paseo'
+const { api } = sdk(network)
 
 async function createCollection() {
   const txCollection = api.tx.Nfts.create({
-    admin: MultiAddress.Id('5FduGmdAjpdiWL8d9fDDKD6kiuUicefrTe7SDEK9RC6frHPW'),
+    admin: MultiAddress.Id(owner),
     config: {
       settings: 0n,
       max_supply: undefined,
@@ -44,13 +45,14 @@ async function createCollection() {
       console.log('event', event.type)
     },
     complete: async () => {
+      console.log(`https://assethub-${network}.subscan.io/nft_collection/${collectionId}?tab=tokens`)
       process.exit(0)
     },
   })
 }
 
 async function mintNFTs() {
-  const collectionId = 202
+  const collectionId = 269
   const total = 5
 
   const queryNfts = await api.query.Nfts.Item.getEntries(collectionId)
@@ -84,8 +86,9 @@ async function mintNFTs() {
     calls: [...txMints, ...txMetadata],
   }).signAndSubmit(signer, { at: 'best' })
 
-  console.log(`https://assethub-westend.subscan.io/nft_collection/${collectionId}?tab=tokens`)
+  console.log(`https://assethub-${network}.subscan.io/nft_collection/${collectionId}?tab=tokens`)
   process.exit(0)
 }
 
 mintNFTs()
+// createCollection()

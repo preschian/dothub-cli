@@ -14,7 +14,9 @@
     "dot-nft": "./dist/index.js"
   },
   "files": [
-    "dist"
+    ".papi",
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "tsdown",

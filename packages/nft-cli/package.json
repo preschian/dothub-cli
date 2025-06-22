@@ -2,24 +2,20 @@
   "name": "dot-nft",
   "type": "module",
   "version": "0.0.0",
-  "description": "A simple example library built by tsdown",
-  "exports": {
-    ".": "./dist/index.js",
-    "./package.json": "./package.json"
-  },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "A CLI tool for minting NFTs on the Polkadot ecosystem",
   "bin": {
-    "dot-nft": "./dist/index.js"
+    "dot-nft": "./dist/dot-nft"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "start": "bun run src/index.ts"
+    "build": "bun build ./src/index.ts --compile --minify --sourcemap --outfile ./dist/dot-nft",
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "postinstall": "npx papi",
+    "prepack": "bun run build"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -40,7 +36,6 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.15.0",
     "@types/bun": "latest",
-    "eslint": "^9.29.0",
-    "tsdown": "latest"
+    "eslint": "^9.29.0"
   }
 }

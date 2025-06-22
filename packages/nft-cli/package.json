@@ -23,6 +23,9 @@
   "peerDependencies": {
     "typescript": "^5"
   },
+  "bundleDependencies": [
+    "@polkadot-api/descriptors"
+  ],
   "dependencies": {
     "@clack/prompts": "^0.11.0",
     "@filebase/sdk": "^1.0.6",

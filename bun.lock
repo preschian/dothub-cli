@@ -16,9 +16,9 @@
     },
     "packages/nft-cli": {
       "name": "dot-nft",
-      "version": "0.0.1-alpha.0",
+      "version": "0.0.1-alpha.1",
       "bin": {
-        "dot-nft": "./dist/dot-nft",
+        "dot-nft": "./src/index.ts",
       },
       "dependencies": {
         "@clack/prompts": "^0.11.0",

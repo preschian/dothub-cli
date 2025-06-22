@@ -12,5 +12,8 @@
   "workspaces": [
     "playground/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@changesets/changelog-github": "^0.5.1"
+  }
 }

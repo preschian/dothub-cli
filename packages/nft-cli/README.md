@@ -1,15 +1,30 @@
-# tsdown-starter
+# dot-nft CLI
 
-To install dependencies:
+A command-line interface tool for minting NFTs on the Polkadot ecosystem.
+
+## Features
+
+- 🖼️ Mint NFTs on Paseo Asset Hub
+- 📁 Upload images to IPFS via Filebase
+- 🎨 Interactive CLI prompts
+- ⚡ Built with Bun and TypeScript
+
+## Installation
 
 ```bash
 bun install
 ```
 
-To run:
+## Usage
 
 ```bash
 bun run ./dist/index.js
 ```
 
-This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Development
+
+```bash
+bun run dev
+```
+
+This project uses [Bun](https://bun.sh) as the JavaScript runtime.

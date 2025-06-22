@@ -4,7 +4,7 @@
   "version": "0.0.1-alpha.1",
   "description": "A CLI tool for minting NFTs on the Polkadot ecosystem",
   "bin": {
-    "dot-nft": "./src/index.ts"
+    "dot-nft": "./src/index.js"
   },
   "files": [
     ".papi",

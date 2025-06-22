@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
+import type { UserConfig } from './config.js'
 import process from 'node:process'
 import { intro, outro, select } from '@clack/prompts'
 import pc from 'picocolors'
 import { displayAccountInfo } from './account.js'
 import { getConfigPath, loadConfig, saveConfig, setupConfig } from './config.js'
 import { runMintingWorkflow } from './create-collection.js'
+import { collectChainSelection } from './prompts.js'
 
-async function showMainMenu() {
+async function showMainMenu(currentChain: string) {
+  const chainDisplay = currentChain === 'paseo' ? 'Paseo' : 'Westend'
+
   const action = await select({
     message: 'What would you like to do?',
     options: [
@@ -20,6 +24,11 @@ async function showMainMenu() {
         value: 'account',
         label: '👤 View Account Information',
         hint: 'Show wallet address and balance',
+      },
+      {
+        value: 'switch-network',
+        label: `🔄 Switch Network (Current: ${chainDisplay})`,
+        hint: 'Change between Paseo and Westend',
       },
       {
         value: 'config',
@@ -37,29 +46,53 @@ async function showMainMenu() {
   return action
 }
 
+async function switchNetwork(currentConfig: UserConfig): Promise<UserConfig> {
+  const newChain = await collectChainSelection()
+
+  if (newChain === currentConfig.chain) {
+    outro(pc.yellow(`Already using ${newChain === 'paseo' ? 'Paseo' : 'Westend'} network`))
+    return currentConfig
+  }
+
+  const updatedConfig: UserConfig = {
+    ...currentConfig,
+    chain: newChain,
+  }
+
+  saveConfig(updatedConfig)
+  const chainName = newChain === 'paseo' ? 'Paseo' : 'Westend'
+  outro(pc.green(`Network switched to ${chainName} Asset Hub! 🔄`))
+
+  return updatedConfig
+}
+
 async function main() {
   try {
     // Check if config already exists
-    const existingConfig = await loadConfig()
+    let existingConfig = await loadConfig()
 
     if (existingConfig) {
       // Show account info
-      await displayAccountInfo(existingConfig.mnemonic)
+      await displayAccountInfo(existingConfig.mnemonic, existingConfig.chain)
 
       // Main menu loop
       while (true) {
-        const action = await showMainMenu()
+        const action = await showMainMenu(existingConfig.chain)
 
         switch (action) {
           case 'mint':
             await runMintingWorkflow(existingConfig)
             break
           case 'account':
-            await displayAccountInfo(existingConfig.mnemonic)
+            await displayAccountInfo(existingConfig.mnemonic, existingConfig.chain)
+            break
+          case 'switch-network':
+            existingConfig = await switchNetwork(existingConfig)
             break
           case 'config': {
             const newConfig = await setupConfig()
             saveConfig(newConfig)
+            existingConfig = newConfig
             outro(pc.green(`Configuration updated! Saved to ${getConfigPath()}`))
             break
           }
@@ -78,7 +111,8 @@ async function main() {
       const config = await setupConfig()
       saveConfig(config)
 
-      outro(pc.green(`Setup complete! Configuration saved to ${getConfigPath()}\nReady to mint NFTs on Paseo Asset Hub! 🚀`))
+      const chainName = config.chain === 'paseo' ? 'Paseo' : 'Westend'
+      outro(pc.green(`Setup complete! Configuration saved to ${getConfigPath()}\nReady to mint NFTs on ${chainName} Asset Hub! 🚀`))
 
       // Start main menu
       await main()

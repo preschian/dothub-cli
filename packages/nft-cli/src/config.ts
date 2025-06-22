@@ -1,13 +1,16 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
-import { collectFilebaseCredentials, collectMnemonic } from './prompts.js'
+import { collectChainSelection, collectFilebaseCredentials, collectMnemonic } from './prompts.js'
+
+export type Chain = 'paseo' | 'westend'
 
 export interface UserConfig {
   mnemonic: string
   filebaseKey: string
   filebaseSecret: string
   filebaseBucket: string
+  chain: Chain
 }
 
 const CONFIG_DIR = '/tmp/dot-nft'
@@ -16,12 +19,14 @@ const CONFIG_FILE = join(CONFIG_DIR, 'config.json')
 export async function setupConfig(): Promise<UserConfig> {
   const mnemonic = await collectMnemonic()
   const filebaseCredentials = await collectFilebaseCredentials()
+  const chain = await collectChainSelection()
 
   const config: UserConfig = {
     mnemonic,
     filebaseKey: filebaseCredentials.key,
     filebaseSecret: filebaseCredentials.secret,
     filebaseBucket: filebaseCredentials.bucket,
+    chain,
   }
 
   return config

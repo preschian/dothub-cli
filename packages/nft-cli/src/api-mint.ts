@@ -1,3 +1,4 @@
+import type { Chain } from './config.js'
 import { spinner } from '@clack/prompts'
 import { MultiAddress } from '@polkadot-api/descriptors'
 import pc from 'picocolors'
@@ -5,9 +6,9 @@ import { Binary } from 'polkadot-api'
 import { deriveAccountFromMnemonic } from './account'
 import { sdk } from './polkadot'
 
-export async function createCollection(mnemonic: string, metadataUri: string) {
+export async function createCollection(mnemonic: string, metadataUri: string, chain: Chain) {
   const { signer, address } = await deriveAccountFromMnemonic(mnemonic)
-  const { api } = sdk('westend')
+  const { api } = sdk(chain)
   const s = spinner()
 
   // create collection
@@ -44,15 +45,15 @@ export async function createCollection(mnemonic: string, metadataUri: string) {
     data: Binary.fromText(metadataUri),
   })
 
-  await txCollectionMetadata.signAndSubmit(signer)
-  s.stop(`Collection metadata updated: https://assethub-westend.subscan.io/nft_collection/${collectionId}`)
+  await txCollectionMetadata.signAndSubmit(signer, { at: 'best' })
+  s.stop(`Collection metadata updated: https://assethub-${chain}.subscan.io/nft_collection/${collectionId}`)
 
   return collectionId
 }
 
-export async function mintNFTs(mnemonic: string, collectionId: number, uris: string[]) {
+export async function mintNFTs(mnemonic: string, collectionId: number, uris: string[], chain: Chain) {
   const { signer, address } = await deriveAccountFromMnemonic(mnemonic)
-  const { api } = sdk('westend')
+  const { api } = sdk(chain)
   const s = spinner()
 
   const txMints = Array.from({ length: uris.length }, (_, index) =>
@@ -76,7 +77,7 @@ export async function mintNFTs(mnemonic: string, collectionId: number, uris: str
   s.start('Minting NFTs...')
   await api.tx.Utility.batch({
     calls: [...txMints, ...txMetadata],
-  }).signAndSubmit(signer)
+  }).signAndSubmit(signer, { at: 'best' })
 
-  s.stop(`Minting completed: https://assethub-westend.subscan.io/nft_collection/${collectionId}?tab=tokens`)
+  s.stop(`Minting completed: https://assethub-${chain}.subscan.io/nft_collection/${collectionId}?tab=tokens`)
 }

@@ -1,5 +1,6 @@
+import type { Chain } from './config.js'
 import process from 'node:process'
-import { cancel, confirm, isCancel, outro, password, text } from '@clack/prompts'
+import { cancel, confirm, isCancel, outro, password, select, text } from '@clack/prompts'
 import pc from 'picocolors'
 
 export async function collectMnemonic(): Promise<string> {
@@ -77,6 +78,31 @@ export async function collectFilebaseCredentials(): Promise<{
     secret: filebaseSecret as string,
     bucket: filebaseBucket as string,
   }
+}
+
+export async function collectChainSelection(): Promise<Chain> {
+  const chain = await select({
+    message: 'Select the blockchain network:',
+    options: [
+      {
+        value: 'paseo' as const,
+        label: 'Paseo Asset Hub',
+        hint: 'Polkadot testnet - recommended for testing',
+      },
+      {
+        value: 'westend' as const,
+        label: 'Westend Asset Hub',
+        hint: 'Alternative testnet - more stable',
+      },
+    ],
+  })
+
+  if (isCancel(chain)) {
+    cancel('Setup cancelled.')
+    process.exit(0)
+  }
+
+  return chain as Chain
 }
 
 export async function promptForReconfiguration(): Promise<boolean> {

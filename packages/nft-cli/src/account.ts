@@ -1,3 +1,4 @@
+import type { Chain } from './config.js'
 import { note } from '@clack/prompts'
 import { sr25519CreateDerive } from '@polkadot-labs/hdkd'
 import { entropyToMiniSecret } from '@polkadot-labs/hdkd-helpers'
@@ -31,7 +32,7 @@ export async function deriveAccountFromMnemonic(mnemonic: string) {
   }
 }
 
-export async function getAccountBalance(address: string) {
+export async function getAccountBalance(address: string, chain: Chain) {
   const emptyState = {
     free: '0',
     reserved: '0',
@@ -43,8 +44,8 @@ export async function getAccountBalance(address: string) {
 
   try {
     // Get account info from the chain
-    const accountInfo = await sdk('westend').api.query.System.Account.getValue(address)
-    const chainSpec = await sdk('westend').client.getChainSpecData()
+    const accountInfo = await sdk(chain).api.query.System.Account.getValue(address)
+    const chainSpec = await sdk(chain).client.getChainSpecData()
     const chainSymbol = chainSpec.properties.tokenSymbol as string
     const chainDecimals = chainSpec.properties.tokenDecimals as number
     const chainName = chainSpec.name
@@ -74,12 +75,12 @@ export async function getAccountBalance(address: string) {
   }
 }
 
-export async function displayAccountInfo(mnemonic: string) {
+export async function displayAccountInfo(mnemonic: string, chain: Chain) {
   try {
     note('Fetching account information...', 'Account Details')
 
     const account = await deriveAccountFromMnemonic(mnemonic)
-    const balance = await getAccountBalance(account.address)
+    const balance = await getAccountBalance(account.address, chain)
 
     const accountDetails = [
       `${pc.bold('Address:')} ${pc.cyan(account.address)}`,

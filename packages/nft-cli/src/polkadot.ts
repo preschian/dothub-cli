@@ -1,3 +1,4 @@
+import type { Chain } from './config.js'
 import { paseo_asset_hub, westend_asset_hub } from '@polkadot-api/descriptors'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
@@ -18,7 +19,7 @@ const client_westend_asset_hub = createClient(
 const api_paseo_asset_hub = client_paseo_asset_hub.getTypedApi(paseo_asset_hub)
 const api_westend_asset_hub = client_westend_asset_hub.getTypedApi(westend_asset_hub)
 
-function sdk(chain: 'paseo' | 'westend') {
+function sdk(chain: Chain) {
   if (chain === 'paseo') {
     return {
       api: api_paseo_asset_hub,

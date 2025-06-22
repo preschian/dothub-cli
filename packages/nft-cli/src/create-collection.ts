@@ -115,7 +115,7 @@ export async function runMintingWorkflow(config: UserConfig): Promise<void> {
     const collectionMetadataUri = await uploadCollectionMetadata(collectionInfo, config)
 
     // Step 3: Create collection
-    const collectionId = await createCollection(config.mnemonic, collectionMetadataUri)
+    const collectionId = await createCollection(config.mnemonic, collectionMetadataUri, config.chain)
 
     // Step 3: Get minting options
     const mintingOptions = await getMintingOptionsPrompt()
@@ -129,7 +129,7 @@ export async function runMintingWorkflow(config: UserConfig): Promise<void> {
     }
 
     // Step 5: Mint NFTs
-    await mintNFTs(config.mnemonic, collectionId, uris)
+    await mintNFTs(config.mnemonic, collectionId, uris, config.chain)
 
     outro(pc.green('NFT collection minting completed! 🚀'))
   }

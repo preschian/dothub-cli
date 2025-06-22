@@ -19,7 +19,6 @@ This is **dot-nft**, a command-line interface tool for minting NFTs on the Polka
 ### Current Architecture
 - **Runtime**: Bun (preferred over Node.js/npm/pnpm)
 - **Language**: TypeScript with isolated declarations
-- **Build Tool**: tsdown for fast TypeScript compilation
 - **CLI Framework**: @clack/prompts for user interactions
 - **Storage**: Filebase SDK for IPFS uploads
 - **Target Network**: Paseo Asset Hub (Phase 1)
@@ -30,7 +29,6 @@ This is **dot-nft**, a command-line interface tool for minting NFTs on the Polka
 - **ALWAYS use Bun** instead of Node.js, npm, pnpm, or Vite
 - Use TypeScript with strict typing
 - Prefer ES modules (`"type": "module"`)
-- Use tsdown for building instead of tsc or other bundlers
 
 ### Code Patterns
 - Interactive CLI flows using @clack/prompts

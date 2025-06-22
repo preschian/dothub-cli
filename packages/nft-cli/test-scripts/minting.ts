@@ -3,9 +3,9 @@
 /* eslint-disable antfu/no-top-level-await */
 import { readFile } from 'node:fs/promises'
 import process from 'node:process'
-import { MultiAddress } from '@polkadot-api/descriptors'
 import { Binary } from 'polkadot-api'
 import { deriveAccountFromMnemonic } from '../src/account'
+import { MultiAddress } from '../src/descriptors'
 import { sdk } from '../src/polkadot'
 
 const owner = '5FduGmdAjpdiWL8d9fDDKD6kiuUicefrTe7SDEK9RC6frHPW'

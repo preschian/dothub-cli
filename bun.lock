@@ -23,7 +23,6 @@
       "dependencies": {
         "@clack/prompts": "^0.11.0",
         "@filebase/sdk": "^1.0.6",
-        "@polkadot-api/descriptors": "file:.papi/descriptors",
         "@polkadot-labs/hdkd": "^0.0.17",
         "@polkadot-labs/hdkd-helpers": "^0.0.17",
         "@polkadot/keyring": "^13.5.2",
@@ -1813,8 +1812,6 @@
     "clean-regexp/escape-string-regexp": ["escape-string-regexp@1.0.5", "", {}, "sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg=="],
 
     "color/color-convert": ["color-convert@1.9.3", "", { "dependencies": { "color-name": "1.1.3" } }, "sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg=="],
-
-    "dot-nft/@polkadot-api/descriptors": ["@polkadot-api/descriptors@file:packages/nft-cli/.papi/descriptors", { "peerDependencies": { "polkadot-api": ">=1.11.2" } }],
 
     "dot-nft/@types/bun": ["@types/bun@1.2.17", "", { "dependencies": { "bun-types": "1.2.17" } }, "sha512-l/BYs/JYt+cXA/0+wUhulYJB6a6p//GTPiJ7nV+QHa8iiId4HZmnu/3J/SowP5g0rTiERY2kfGKXEK5Ehltx4Q=="],
 

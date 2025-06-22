@@ -1,9 +1,9 @@
 import type { Chain } from './config.js'
 import { spinner } from '@clack/prompts'
-import { MultiAddress } from '@polkadot-api/descriptors'
 import pc from 'picocolors'
 import { Binary } from 'polkadot-api'
 import { deriveAccountFromMnemonic } from './account'
+import { MultiAddress } from './descriptors'
 import { sdk } from './polkadot'
 
 export async function createCollection(mnemonic: string, metadataUri: string, chain: Chain) {

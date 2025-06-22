@@ -1,6 +1,6 @@
 {
   "version": 0,
-  "descriptorPath": ".papi/descriptors",
+  "descriptorPath": "src/descriptors",
   "entries": {
     "paseo_asset_hub": {
       "chain": "paseo_asset_hub",

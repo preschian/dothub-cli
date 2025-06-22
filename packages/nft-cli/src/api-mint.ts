@@ -3,7 +3,7 @@ import { spinner } from '@clack/prompts'
 import pc from 'picocolors'
 import { Binary } from 'polkadot-api'
 import { deriveAccountFromMnemonic } from './account'
-import { MultiAddress } from './descriptors'
+import { MultiAddress } from './descriptors/dist/index'
 import { sdk } from './polkadot'
 
 export async function createCollection(mnemonic: string, metadataUri: string, chain: Chain) {

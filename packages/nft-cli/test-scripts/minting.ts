@@ -50,13 +50,16 @@ async function createCollection() {
 }
 
 async function mintNFTs() {
-  const collectionId = 203
+  const collectionId = 202
   const total = 5
+
+  const queryNfts = await api.query.Nfts.Item.getEntries(collectionId)
+  const existingNfts = queryNfts.length
 
   const txMints = Array.from({ length: total }, (_, index) =>
     api.tx.Nfts.mint({
       collection: collectionId,
-      item: index + 1,
+      item: index + 1 + existingNfts,
       mint_to: MultiAddress.Id(owner),
       witness_data: {
         mint_price: 0n,
@@ -67,7 +70,7 @@ async function mintNFTs() {
   const txMetadata = Array.from({ length: total }, (_, index) =>
     api.tx.Nfts.set_metadata({
       collection: collectionId,
-      item: index + 1,
+      item: index + 1 + existingNfts,
       data: Binary.fromText('test'),
     }).decodedCall)
 
@@ -77,17 +80,12 @@ async function mintNFTs() {
   }
 
   console.log('starting batch')
-  api.tx.Utility.batch({
+  await api.tx.Utility.batch({
     calls: [...txMints, ...txMetadata],
-  }).signSubmitAndWatch(signer).subscribe({
-    next: (event) => {
-      console.log('event', event.type)
-    },
-    complete: async () => {
-      console.log(`https://assethub-westend.subscan.io/nft_collection/${collectionId}?tab=tokens`)
-      process.exit(0)
-    },
-  })
+  }).signAndSubmit(signer, { at: 'best' })
+
+  console.log(`https://assethub-westend.subscan.io/nft_collection/${collectionId}?tab=tokens`)
+  process.exit(0)
 }
 
 mintNFTs()

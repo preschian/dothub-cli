@@ -12,10 +12,11 @@
     "src"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --compile --minify --sourcemap --outfile ./dist/dot-nft",
-    "dev": "bun run --watch src/index.ts",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "start": "bun run src/index.ts",
-    "postinstall": "npx papi"
+    "postinstall": "npx papi",
+    "prepare": "bun run build"
   },
   "publishConfig": {
     "access": "public"
@@ -42,6 +43,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.15.0",
     "@types/bun": "latest",
-    "eslint": "^9.29.0"
+    "eslint": "^9.29.0",
+    "tsdown": "^0.12.8"
   }
 }

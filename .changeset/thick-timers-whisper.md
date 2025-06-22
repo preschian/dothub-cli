@@ -1,5 +1,5 @@
 ---
-"dot-nft": prerelease
+"dot-nft": patch
 ---
 
 ci: setup pkg-pr

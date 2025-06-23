@@ -2,12 +2,14 @@
 
 import type { UserConfig } from './config.js'
 import process from 'node:process'
-import { intro, outro, select } from '@clack/prompts'
+import { intro, note, outro, select } from '@clack/prompts'
 import pc from 'picocolors'
+import { version } from '../package.json'
 import { displayAccountInfo } from './account.js'
 import { getConfigPath, loadConfig, saveConfig, setupConfig } from './config.js'
 import { runMintingWorkflow } from './create-collection.js'
 import { collectChainSelection } from './prompts.js'
+import { FIRST_TIME_SETUP_INTRO, WELCOME_MESSAGE } from './text.js'
 
 async function showMainMenu(currentChain: string) {
   const chainDisplay = currentChain === 'paseo' ? 'Paseo' : 'Westend'
@@ -68,6 +70,9 @@ async function switchNetwork(currentConfig: UserConfig): Promise<UserConfig> {
 
 async function main() {
   try {
+    // Show welcome message
+    note(WELCOME_MESSAGE)
+
     // Check if config already exists
     let existingConfig = await loadConfig()
 
@@ -108,6 +113,8 @@ async function main() {
     }
     else {
       // Setup new configuration
+      note(FIRST_TIME_SETUP_INTRO)
+
       const config = await setupConfig()
       saveConfig(config)
 
@@ -124,5 +131,5 @@ async function main() {
   }
 }
 
-intro(pc.bgBlue(' Dot NFT CLI 🎨 '))
+intro(pc.bgBlue(`  dot-nft@${version}  `))
 main()

@@ -5,21 +5,23 @@ import { basename } from 'node:path'
 import process from 'node:process'
 import { confirm, note, outro, spinner, text } from '@clack/prompts'
 import pc from 'picocolors'
-import { getImagesFromFolder, uploadImageToIPFS, uploadMetadataToIPFS } from './upload'
+import { uploadImageToIPFS, uploadMetadataToIPFS } from './upload'
 
 export interface MintingOptions {
   nftNameBase: string
   nftDescription: string
-  imagesFolderPath: string
+  imagePath: string
+  isNumbered: boolean
   startingNumber: number
+  totalCopies: number
 }
 
-export async function getMintingOptionsPrompt(): Promise<MintingOptions> {
-  note('Now let\'s configure your NFT minting!', 'Minting Setup')
+export async function getOpenEditionMintingOptions(): Promise<MintingOptions> {
+  note('Now let\'s configure your Open Edition NFT minting!', 'Open Edition Setup')
 
   const nftNameBase = await text({
-    message: 'Enter base name for NFTs (will be numbered):',
-    placeholder: 'My NFT #',
+    message: 'Enter base name for Open Edition NFTs (will be numbered):',
+    placeholder: 'My Open Edition NFT #',
     validate: (value) => {
       if (!value)
         return 'NFT base name is required'
@@ -34,8 +36,8 @@ export async function getMintingOptionsPrompt(): Promise<MintingOptions> {
   }
 
   const nftDescription = await text({
-    message: 'Enter description for all NFTs:',
-    placeholder: 'A unique piece from our exclusive collection...',
+    message: 'Enter description for all Open Edition NFTs:',
+    placeholder: 'A unique piece from our open edition collection...',
     validate: (value) => {
       if (!value)
         return 'NFT description is required'
@@ -49,56 +51,95 @@ export async function getMintingOptionsPrompt(): Promise<MintingOptions> {
     process.exit(0)
   }
 
-  const imagesFolderPath = await text({
-    message: 'Enter folder path containing NFT images:',
-    placeholder: './nft-images/',
-    validate: (value) => {
-      if (!value)
-        return 'Images folder path is required'
-      if (!existsSync(value))
-        return 'Folder does not exist'
-      try {
-        const stat = statSync(value)
-        if (!stat.isDirectory())
-          return 'Path must be a directory'
-      }
-      catch {
-        return 'Cannot access folder'
-      }
-      const images = getImagesFromFolder(value)
-      if (images.length === 0)
-        return 'Folder contains no valid image files'
-    },
+  const isNumbered = await confirm({
+    message: 'Should NFTs be numbered (e.g., "My NFT #1", "My NFT #2")?',
+    initialValue: true,
   })
 
-  if (typeof imagesFolderPath !== 'string') {
+  if (typeof isNumbered !== 'boolean') {
     outro(pc.red('Minting setup cancelled'))
     process.exit(0)
   }
 
-  const startingNumber = await text({
-    message: 'Starting number for NFTs:',
-    placeholder: '1',
-    initialValue: '1',
+  const totalCopies = await text({
+    message: 'How many copies would you like to create?',
+    placeholder: '100',
     validate: (value) => {
       if (!value)
-        return 'Starting number is required'
+        return 'Number of copies is required'
       const num = Number.parseInt(value)
       if (Number.isNaN(num) || num < 1)
         return 'Must be a positive number'
+      if (num > 10000)
+        return 'Maximum 10,000 copies allowed'
     },
   })
 
-  if (typeof startingNumber !== 'string') {
+  if (typeof totalCopies !== 'string') {
     outro(pc.red('Minting setup cancelled'))
     process.exit(0)
+  }
+
+  const imagePath = await text({
+    message: 'Enter path to Open Edition NFT image:',
+    placeholder: './my-open-edition.png',
+    validate: (value) => {
+      if (!value)
+        return 'Image path is required'
+      if (!existsSync(value))
+        return 'Image file does not exist'
+      try {
+        const stat = statSync(value)
+        if (!stat.isFile())
+          return 'Path must be a file'
+      }
+      catch {
+        return 'Cannot access file'
+      }
+      // Check if it's a valid image file
+      const ext = value.toLowerCase()
+      if (!ext.endsWith('.png') && !ext.endsWith('.jpg') && !ext.endsWith('.jpeg') && !ext.endsWith('.gif') && !ext.endsWith('.webp')) {
+        return 'File must be a valid image (PNG, JPG, JPEG, GIF, WEBP)'
+      }
+    },
+  })
+
+  if (typeof imagePath !== 'string') {
+    outro(pc.red('Minting setup cancelled'))
+    process.exit(0)
+  }
+
+  let startingNumber = 1
+
+  if (isNumbered) {
+    const startingNumberInput = await text({
+      message: 'Starting number for Open Edition NFTs:',
+      placeholder: '1',
+      initialValue: '1',
+      validate: (value) => {
+        if (!value)
+          return 'Starting number is required'
+        const num = Number.parseInt(value)
+        if (Number.isNaN(num) || num < 1)
+          return 'Must be a positive number'
+      },
+    })
+
+    if (typeof startingNumberInput !== 'string') {
+      outro(pc.red('Minting setup cancelled'))
+      process.exit(0)
+    }
+
+    startingNumber = Number.parseInt(startingNumberInput)
   }
 
   return {
     nftNameBase,
     nftDescription,
-    imagesFolderPath,
-    startingNumber: Number.parseInt(startingNumber),
+    imagePath,
+    isNumbered,
+    startingNumber,
+    totalCopies: Number.parseInt(totalCopies),
   }
 }
 
@@ -107,17 +148,18 @@ export async function uploadImagesAndMetadata(
   mintingOptions: MintingOptions,
   config: UserConfig,
 ) {
-  const images = getImagesFromFolder(mintingOptions.imagesFolderPath)
-
-  if (images.length === 0) {
-    outro(pc.red('No images found in the specified folder'))
+  // For Open Edition, we use the same image for all copies
+  if (!existsSync(mintingOptions.imagePath)) {
+    outro(pc.red('Image file does not exist'))
     return
   }
 
-  note(`Found ${images.length} images to upload`, 'Ready to Upload')
+  const actualCopies = mintingOptions.totalCopies
+
+  note(`Creating ${actualCopies} copies of Open Edition NFT using: ${basename(mintingOptions.imagePath)}`, 'Ready to Upload')
 
   const shouldProceed = await confirm({
-    message: `Proceed with uploading ${images.length} NFT images and metadata to IPFS?`,
+    message: `Proceed with creating ${actualCopies} Open Edition NFT copies and uploading metadata to IPFS?`,
     initialValue: true,
   })
 
@@ -131,24 +173,31 @@ export async function uploadImagesAndMetadata(
   let failCount = 0
   const metadataUris: string[] = []
 
-  for (let i = 0; i < images.length; i++) {
-    const imagePath = images[i]
+  // Upload the single image once to IPFS
+  s.start(`Uploading Open Edition NFT image: ${basename(mintingOptions.imagePath)}...`)
+
+  let imageResult
+  try {
+    imageResult = await uploadImageToIPFS(mintingOptions.imagePath, config)
+    s.stop(`✅ Image uploaded successfully: ${pc.cyan(imageResult.filebaseUrl)}`)
+  }
+  catch (error) {
+    s.stop(`❌ Failed to upload image: ${error}`)
+    outro(pc.red('Cannot proceed without uploading the image'))
+    return
+  }
+
+  // Create metadata for each copy
+  for (let i = 0; i < actualCopies; i++) {
     const tokenId = mintingOptions.startingNumber + i
-    const nftName = `${mintingOptions.nftNameBase} #${tokenId}`
+    const nftName = mintingOptions.isNumbered
+      ? `${mintingOptions.nftNameBase} #${tokenId}`
+      : mintingOptions.nftNameBase
 
-    if (!imagePath) {
-      s.stop(`❌ Failed to mint NFT ${tokenId}: Image path is undefined`)
-      failCount++
-      continue
-    }
-
-    s.start(`Uploading NFT ${tokenId}: ${basename(imagePath)}...`)
+    s.start(`Creating metadata for Open Edition NFT ${mintingOptions.isNumbered ? `#${tokenId}` : `${i + 1}`}...`)
 
     try {
-      // Upload image to IPFS
-      const imageResult = await uploadImageToIPFS(imagePath, config)
-
-      // Create metadata
+      // Create metadata using the same image
       const metadata: Metadata = {
         name: nftName,
         description: mintingOptions.nftDescription,
@@ -161,23 +210,25 @@ export async function uploadImagesAndMetadata(
 
       metadataUris.push(metadataResult.filebaseUrl)
 
-      s.stop(`✅ Uploaded NFT ${tokenId} metadata successfully: ${pc.cyan(metadataResult.filebaseUrl)}`)
+      s.stop(`✅ Created metadata for Open Edition NFT ${mintingOptions.isNumbered ? `#${tokenId}` : `${i + 1}`}: ${pc.cyan(metadataResult.filebaseUrl)}`)
       successCount++
     }
     catch (error) {
-      s.stop(`❌ Failed to upload NFT ${tokenId} metadata: ${error}`)
+      s.stop(`❌ Failed to create metadata for Open Edition NFT ${mintingOptions.isNumbered ? `#${tokenId}` : `${i + 1}`}: ${error}`)
       failCount++
     }
   }
 
   // Summary
   note([
-    `🎉 Upload completed!`,
-    `✅ Successfully uploaded: ${pc.green(successCount.toString())} NFT images and metadata`,
-    failCount > 0 ? `❌ Failed: ${pc.red(failCount.toString())} NFT uploads` : '',
+    `🎉 Open Edition NFT creation completed!`,
+    `✅ Successfully created: ${pc.green(successCount.toString())} Open Edition NFT metadata entries`,
+    failCount > 0 ? `❌ Failed: ${pc.red(failCount.toString())} Open Edition NFT metadata` : '',
     `📁 Collection: ${pc.cyan(collectionId.toString())}`,
+    `🖼️ Image: ${pc.cyan(basename(mintingOptions.imagePath))}`,
+    `🔢 Numbering: ${mintingOptions.isNumbered ? pc.green('Enabled') : pc.yellow('Disabled')}`,
     `🗂️ Total processed: ${pc.bold((successCount + failCount).toString())}`,
-  ].filter(Boolean).join('\n'), 'Upload Summary')
+  ].filter(Boolean).join('\n'), 'Creation Summary')
 
   return metadataUris
 }

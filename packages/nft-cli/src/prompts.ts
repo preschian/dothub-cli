@@ -118,3 +118,42 @@ export async function promptForReconfiguration(): Promise<boolean> {
 
   return shouldReconfigure as boolean
 }
+
+export type NFTType = 'open-edition' | 'more-coming-soon'
+
+export async function collectNFTTypeSelection(): Promise<NFTType> {
+  const nftType = await select({
+    message: 'Select NFT type:',
+    options: [
+      {
+        value: 'open-edition' as const,
+        label: '🎨 Open Edition NFT',
+        hint: 'Unlimited minting - perfect for digital art collections',
+      },
+      {
+        value: 'more-coming-soon' as const,
+        label: '✨ More... (coming soon)',
+        hint: 'Limited Edition & other NFT types',
+      },
+    ],
+  })
+
+  if (isCancel(nftType)) {
+    cancel('NFT creation cancelled.')
+    process.exit(0)
+  }
+
+  // Handle coming soon option
+  if (nftType === 'more-coming-soon') {
+    outro(pc.yellow(`More NFT types are coming soon! 🚀
+
+Upcoming features:
+• 💎 Limited Edition NFTs
+• 🎯 And more...
+
+Currently only Open Edition NFTs are supported.`))
+    process.exit(0)
+  }
+
+  return nftType as NFTType
+}

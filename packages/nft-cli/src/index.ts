@@ -70,6 +70,8 @@ async function switchNetwork(currentConfig: UserConfig): Promise<UserConfig> {
 
 async function main() {
   try {
+    intro(pc.bgBlue(`  dot-nft@${version}  `))
+
     // Show welcome message
     note(WELCOME_MESSAGE)
 
@@ -131,5 +133,4 @@ async function main() {
   }
 }
 
-intro(pc.bgBlue(`  dot-nft@${version}  `))
 main()

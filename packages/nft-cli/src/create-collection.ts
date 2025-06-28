@@ -6,6 +6,7 @@ import { note, outro, spinner, text } from '@clack/prompts'
 import pc from 'picocolors'
 import { createCollection, mintNFTs } from './api-mint.js'
 import { getMintingOptionsPrompt, uploadImagesAndMetadata } from './create-nft.js'
+import { collectNFTTypeSelection } from './prompts.js'
 import { uploadImageToIPFS, uploadMetadataToIPFS } from './upload.js'
 
 export interface CollectionInfo {
@@ -108,19 +109,26 @@ export async function uploadCollectionMetadata(
 
 export async function runMintingWorkflow(config: UserConfig): Promise<void> {
   try {
-    // Step 1: Prompt for collection
+    // Step 1: Select NFT type
+    note('Let\'s start by choosing your NFT type!', 'NFT Type Selection')
+    const _nftType = await collectNFTTypeSelection()
+
+    // Continue with Open Edition NFT workflow
+    note(`Creating ${pc.cyan('Open Edition NFT')} collection...`, 'Collection Setup')
+
+    // Step 2: Prompt for collection
     const collectionInfo = await createCollectionPrompt()
 
-    // Step 2: Upload collection metadata
+    // Step 3: Upload collection metadata
     const collectionMetadataUri = await uploadCollectionMetadata(collectionInfo, config)
 
-    // Step 3: Create collection
+    // Step 4: Create collection
     const collectionId = await createCollection(config.mnemonic, collectionMetadataUri, config.chain)
 
-    // Step 3: Get minting options
+    // Step 5: Get minting options
     const mintingOptions = await getMintingOptionsPrompt()
 
-    // Step 4: Upload images and metadata to IPFS
+    // Step 6: Upload images and metadata to IPFS
     const uris = await uploadImagesAndMetadata(collectionId, mintingOptions, config)
 
     if (!uris) {
@@ -128,10 +136,10 @@ export async function runMintingWorkflow(config: UserConfig): Promise<void> {
       process.exit(0)
     }
 
-    // Step 5: Mint NFTs
+    // Step 7: Mint NFTs
     await mintNFTs(config.mnemonic, collectionId, uris, config.chain)
 
-    outro(pc.green('NFT collection minting completed! 🚀'))
+    outro(pc.green('Open Edition NFT collection minting completed! 🚀'))
   }
   catch (error) {
     outro(pc.red(`Minting failed: ${error}`))

@@ -5,7 +5,7 @@ import process from 'node:process'
 import { note, outro, spinner, text } from '@clack/prompts'
 import pc from 'picocolors'
 import { createCollection, mintNFTs } from './api-mint.js'
-import { getMintingOptionsPrompt, uploadImagesAndMetadata } from './create-nft.js'
+import { getOpenEditionMintingOptions, uploadImagesAndMetadata } from './create-nft.js'
 import { collectNFTTypeSelection } from './prompts.js'
 import { uploadImageToIPFS, uploadMetadataToIPFS } from './upload.js'
 
@@ -125,8 +125,8 @@ export async function runMintingWorkflow(config: UserConfig): Promise<void> {
     // Step 4: Create collection
     const collectionId = await createCollection(config.mnemonic, collectionMetadataUri, config.chain)
 
-    // Step 5: Get minting options
-    const mintingOptions = await getMintingOptionsPrompt()
+    // Step 5: Get Open Edition minting options
+    const mintingOptions = await getOpenEditionMintingOptions()
 
     // Step 6: Upload images and metadata to IPFS
     const uris = await uploadImagesAndMetadata(collectionId, mintingOptions, config)
